@@ -1,4 +1,4 @@
-# TODO
+# PlayCAP
 
 We are given 2 files:
 - HTML5 application (`app.html`)
@@ -7,8 +7,8 @@ We are given 2 files:
 At first I started looking at app.html. When opened it presents a simple screen keyboard.   
 ![app](screenshots/app.png)
    
-By analysing given javascript you can guess that the app might be controlled through an external gamepad. 
-Basically you can send commands like `left`, `right`, `up` and `down` 
+By analysing given javascript I found out that the app might be controlled through an external gamepad. 
+Basically you we send commands like `left`, `right`, `up` and `down` 
 which will move a cursor in corresponding direction. Also `select` appends
 focused character to the "Flag" field, and `reset` moves cursor into initial position.
 These action are triggered using a DPAD and A/X buttons. I didn't have any gamepad to test it,
@@ -61,24 +61,38 @@ so I made sure I'm able to control the input by applying modification to the end
 </html>
 ``` 
    
-![app](screenshots/app_modified.png)
+![app_modified](screenshots/app_modified.png)
    
 By changing content of `inputs` variable we are able to simulate an input from gamepad.
 
 Let's jump into analysing .pcap file.
    
-.pcap contains a USB traffic captured between game controller and a host, so I assumed the flag
-is encoded as a series of inputs. 
-
-Device reports VendorID=`0x057e` and ProductID=`0x2009`, 
-which most probably is a Nintendo Pro Controller.
+I opened given .pcap file in Wireshark. It seemed to contain a USB traffic captured between game controller and a host.
    
-I filtered packed that I suspected of containing inputs:
+![wireshark](screenshots/wireshark.png)
+   
+I immediately realized that this sequence of packets represents a series of inputs that after applying
+will type a flag in provided HTML5 application.
+    
+At this point I started researching USB HID protocol. These sources seemed to be useful:
+- https://www.usb.org/sites/default/files/documents/hut1_12v2.pdf
+- https://www.beyondlogic.org/usbnutshell/usb5.shtml
+
+I also found a writeup for a similar challenge from the past:
+- https://medium.com/@ali.bawazeeer/kaizen-ctf-2018-reverse-engineer-usb-keystrok-from-pcap-file-2412351679f4
+ 
+I found out that the device reports VendorID=`0x057e` and ProductID=`0x2009`, 
+so most probably it's a Nintendo Pro Controller. I found several projects aiming for reversing this model:
+- https://github.com/shinyquagsire23/HID-Joy-Con-Whispering
+- https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering
+   
+Next thing I did was filtering packets that I suspected to be valuable:
 ```
 ((usb.transfer_type == 0x01) && (frame.len == 91)) && (usb.endpoint_address.direction == IN)
 ```
 Then I exported filtered packets to `traffic.json` file (File -> Export packets dissection -> as json... -> traffic.json)
-
+   
+I wrote a small python script and started analysing the data
 ```python
 import json
 
@@ -107,16 +121,12 @@ for entry in root:
 ...
 ```
 
-Then I spend a LOT of time trying to analyse these packets. At the beginning I tried to find
-repeating patterns, then started googling. I stumbled across several projects aimed to reverse engineer
-Nintendo JoyCons:
-- https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering
-- https://github.com/shinyquagsire23/HID-Joy-Con-Whispering
+I spend a LOT of time trying to find any patterns and apply knowledge from sources mentioned above.
+Unfortunately nothing seemed to work. 
 
-but finally, the most useful source turned to be some patch, merged into Linux some time ago:
+Finally I stumbled upon this patch proposed for Linux kernel some time ago:
 - https://patchwork.kernel.org/patch/10761581/
 
-I found the following code there
 ```c
 //...
 ctlr->but_y		= 0x01 & data[3];
@@ -143,4 +153,151 @@ ctlr->but_sr_left_jc	= 0x10 & data[5];
 ctlr->but_sl_left_jc	= 0x20 & data[5];
 // ...
 ```
+Immediately after implementing this pattern 
+I noticed that generated keystroke combinations finally started to make sense.
+   
+I wrote an exploit `solve.py`, and found out that combination is:
+```
+var inputs = [
+	"down",
+	"reset",
+	"reset",
+	"reset",
+	"right",
+	"right",
+	"right",
+	"select",
+	"down",
+	"down",
+	"down",
+	"down",
+	"select",
+	"up",
+	"left",
+	"select",
+	"right",
+	"right",
+	"right",
+	"right",
+	"right",
+	"right",
+	"right",
+	"select",
+	"right",
+	"right",
+	"right",
+	"right",
+	"right",
+	"up",
+	"up",
+	"right",
+	"right",
+	"right",
+	"right",
+	"select",
+	"down",
+	"down",
+	"down",
+	"down",
+	"select",
+	"up",
+	"up",
+	"up",
+	"up",
+	"left",
+	"left",
+	"left",
+	"left",
+	"left",
+	"left",
+	"left",
+	"select",
+	"down",
+	"down",
+	"left",
+	"select",
+	"right",
+	"right",
+	"right",
+	"right",
+	"right",
+	"down",
+	"select",
+	"left",
+	"select",
+	"up",
+	"up",
+	"up",
+	"right",
+	"select",
+	"down",
+	"down",
+	"right",
+	"right",
+	"right",
+	"left",
+	"select",
+	"up",
+	"left",
+	"select",
+	"down",
+	"down",
+	"left",
+	"left",
+	"left",
+	"left",
+	"left",
+	"left",
+	"down",
+	"select",
+	"up",
+	"up",
+	"up",
+	"up",
+	"up",
+	"select",
+	"right",
+	"right",
+	"right",
+	"right",
+	"right",
+	"right",
+	"select",
+	"down",
+	"down",
+	"select",
+	"right",
+	"right",
+	"down",
+	"select",
+	"right",
+	"right",
+	"select",
+	"right",
+	"down",
+	"select",
+	"up",
+	"up",
+	"right",
+	"right",
+	"right",
+	"right",
+	"right",
+	"select",
+	"right",
+	"right",
+	"right",
+	"select",
+	"down",
+	"down",
+	"down",
+	"select",
+	"reset"
+];
+``` 
 
+I copied it to app.html, and retrieved the flag
+   
+![flag](screenshots/flag.png)
+   
+`DrgnS{LetsPlayAGamepad}`
