@@ -1,15 +1,18 @@
 # TODO
 
-We receive 2 files:
-- HTML5 application that makes use of connected gamepad (`app.html`)
-- Packet Capture (.pcap) file that seem to contain some USB traffic  (`PlayCAP.pcapng`)
+We are given 2 files:
+- HTML5 application (`app.html`)
+- Packet Capture file (`PlayCAP.pcapng`)
 
-At first I started looking at app.html. When opened it presents a simple screen keyboard,
-that might be controlled through an external gamepad. Basically you can send commands like
-`left`, `right`, `up` and `down` that will move cursor through rows and columns, one at a time. Also `select` appends
-focused character to "Flag" field, and `reset` moves cursor into initial position. They seemed
-to be controlled through a DPAD and A/X buttons. I didn't have any gamepad to test it,
-so I made sure that I'm able to control the input by applying modification at the end of source code.
+At first I started looking at app.html. When opened it presents a simple screen keyboard.
+![app][screenshots/app.png]
+
+By analysing given javascript you can guess that the app might be controlled through an external gamepad. 
+Basically you can send commands like `left`, `right`, `up` and `down` 
+which will move a cursor in corresponding direction. Also `select` appends
+focused character to the "Flag" field, and `reset` moves cursor into initial position.
+These action are triggered using a DPAD and A/X buttons. I didn't have any gamepad to test it,
+so I made sure I'm able to control the input by applying modification to the end of the script.
 ```javascript
   //...
   window.gamepad_poll = setInterval(function() {
@@ -38,10 +41,12 @@ so I made sure that I'm able to control the input by applying modification at th
     ////////////////////////////////////
     
     var inputs = [
-        "left",
-        "down",
+        "select",
         "right",
-        "select"
+        "select",
+        "right",
+        "select",
+        "down"
     ];
 
     for (i = 0; i < inputs.length; i++) {
@@ -55,7 +60,9 @@ so I made sure that I'm able to control the input by applying modification at th
   </script>
 </html>
 ``` 
+![app][screenshots/app_modified.png]
 By changing content of `inputs` variable we are able to simulate an input from gamepad.
+
 Let's jump into analysing .pcap file.
    
 .pcap contains a USB traffic captured between game controller and a host, so I assumed the flag
