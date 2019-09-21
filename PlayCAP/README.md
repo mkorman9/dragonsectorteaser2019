@@ -82,7 +82,7 @@ I also found a writeup for a similar challenge from the past:
 - https://medium.com/@ali.bawazeeer/kaizen-ctf-2018-reverse-engineer-usb-keystrok-from-pcap-file-2412351679f4
  
 I found out that the device reports VendorID=`0x057e` and ProductID=`0x2009`, 
-so most probably it's a Nintendo Pro Controller. I found several projects aiming for reversing this model:
+so most probably it's a Nintendo Pro Controller. I found several projects aiming to reverse this model:
 - https://github.com/shinyquagsire23/HID-Joy-Con-Whispering
 - https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering
    
