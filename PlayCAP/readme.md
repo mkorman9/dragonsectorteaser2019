@@ -4,9 +4,9 @@ We are given 2 files:
 - HTML5 application (`app.html`)
 - Packet Capture file (`PlayCAP.pcapng`)
 
-At first I started looking at app.html. When opened it presents a simple screen keyboard.
-![app][screenshots/app.png]
-
+At first I started looking at app.html. When opened it presents a simple screen keyboard.   
+![app](screenshots/app.png)
+   
 By analysing given javascript you can guess that the app might be controlled through an external gamepad. 
 Basically you can send commands like `left`, `right`, `up` and `down` 
 which will move a cursor in corresponding direction. Also `select` appends
@@ -60,7 +60,9 @@ so I made sure I'm able to control the input by applying modification to the end
   </script>
 </html>
 ``` 
-![app][screenshots/app_modified.png]
+   
+![app](screenshots/app_modified.png)
+   
 By changing content of `inputs` variable we are able to simulate an input from gamepad.
 
 Let's jump into analysing .pcap file.
