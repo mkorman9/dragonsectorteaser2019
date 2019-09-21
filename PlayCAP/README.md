@@ -8,7 +8,7 @@ At first I started looking at app.html. When opened it presents a simple screen 
 ![app](screenshots/app.png)
    
 By analysing given javascript I found out that the app might be controlled through an external gamepad. 
-Basically you we send commands like `left`, `right`, `up` and `down` 
+Basically we send commands like `left`, `right`, `up` and `down` 
 which will move a cursor in corresponding direction. Also `select` appends
 focused character to the "Flag" field, and `reset` moves cursor into initial position.
 These action are triggered using a DPAD and A/X buttons. I didn't have any gamepad to test it,
