@@ -102,7 +102,7 @@ f.close()
 
 for entry in root:
     capdata = entry['_source']['layers']['usb.capdata']
-    capdata = capdata.replace(':', '').decode('hex')
+    capdata = capdata.replace(':', '')
     print capdata
 ```
 ```
