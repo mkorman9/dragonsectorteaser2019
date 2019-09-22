@@ -8,9 +8,9 @@ At first I started looking at app.html. When opened it presents a simple screen 
 ![app](screenshots/app.png)
    
 By analysing given javascript I found out that the app might be controlled through an external gamepad. 
-Basically we send commands like `left`, `right`, `up` and `down` 
-which will move a cursor in corresponding direction. Also `select` appends
-focused character to the "Flag" field, and `reset` moves cursor into initial position.
+Basically we can send commands like `left`, `right`, `up` and `down` 
+which will move a cursor in a corresponding direction. Also `select` appends
+a focused character to the "Flag" field, and `reset` moves a cursor to the initial position.
 These action are triggered using a DPAD and A/X buttons. I didn't have any gamepad to test it,
 so I made sure I'm able to control the input by applying modification to the end of the script.
 ```javascript
@@ -121,7 +121,7 @@ for entry in root:
 ...
 ```
 
-I spend a LOT of time trying to find any patterns and apply knowledge from sources mentioned above.
+I spent a LOT of time trying to find any patterns and apply knowledge from sources mentioned above.
 Unfortunately nothing seemed to work. 
 
 Finally I stumbled upon this patch proposed for Linux kernel some time ago:
@@ -154,9 +154,9 @@ ctlr->but_sl_left_jc	= 0x20 & data[5];
 // ...
 ```
 Immediately after implementing this pattern 
-I noticed that generated keystroke combinations finally started to make sense.
+I noticed that the generated keystroke combinations finally started to make sense.
    
-I wrote an exploit `solve.py`, and found out that combination is:
+I wrote an exploit `solve.py`, and found out that the combination is:
 ```
 var inputs = [
 	"down",
@@ -296,7 +296,7 @@ var inputs = [
 ];
 ``` 
 
-I copied it to app.html, and retrieved the flag
+I copied inputs to to app.html, and retrieved the flag
    
 ![flag](screenshots/flag.png)
    
